@@ -1,0 +1,38 @@
+# 必用なモジュールをインポート
+import csv
+import glob
+import os
+import zipfile
+import shutil
+
+# 処理に必用な値を定義
+download = "download"
+work = "./work"
+input = "./input"
+output = "./output"
+
+# filtered = [['23010001', 'TSMG23010001', 'TSMG2301 0001', '19960707', 'F', '20230111', 'MG', '内藤\u3000洋俊', '', '4', '3', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'], ['23010002', 'TSMG23010002', 'TSMG2301 0002', '19960707', 'F', '20230120', 'MG', '内藤\u3000洋俊', '', '1', '1', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '1303', '不均一高濃度', ''], ['', 'TSMG23010003', 'TSMG2301 0003', '19960707', 'F', '20230120', 'MG', '内藤\u3000洋俊', '', '4', '3', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '1302', '乳腺散在', '']]
+filtered = []
+original = "マンモ動作確認用_2.csv"
+
+with open (original,"r", encoding="SJIS") as f:
+    rows = csv.reader(f)
+# 1-28項目のデータを取り出してfilteredに格納
+    for row in rows:
+        filtered_row = row[:28]  # 1-28項目を取り出す
+        filtered.append(filtered_row)
+print(filtered)
+with open(original, "w", newline="", encoding="SJIS") as i:
+    csv.writer(i).writerows(filtered)
+
+# if original.endswith(".csv"):
+#     file_path = os.path.join(input, original)
+#     with open(file_path, "r", encoding="SJIS", newline="") as csvfile:
+#         csv_reader = csv.reader(csvfile)
+#         header = next(csv_reader)  # Read the header row (optional if you want to skip it)
+#         filtered.append(header)
+#     with open(file_path, "r", encoding="SJIS", newline="") as csvfile:
+#         csv_reader = csv.reader(csvfile)
+#         for line_number, row in enumerate(csv_reader, start=1):
+#             if line_number <= 28:
+#                 filtered.append(row)
