@@ -88,6 +88,7 @@ def read_csv_file(file_path, column_indices):
 original = []
 filtered=[]
 
+# 5-1. 元のcsvファイルを読み込んでoriginalに入れる関数を設定
 def read_original():
     if file.endswith(".csv"):
         file_path = os.path.join(input, file)
@@ -97,6 +98,7 @@ def read_original():
             for row in csv_reader:
                 original.append(row)
 
+# 5-2. 左右として抽出した値をfiltered変数に入れてcsvを上書きする関数を設定
 def filter_and_overwrite_csv():
     if file.endswith(".csv"):
         file_path = os.path.join(input, file)
@@ -121,12 +123,13 @@ def filter_and_overwrite_csv():
 
 # print(original)
 
-# 6-1. 4と5で抽出した情報を基に左右の振り分け実施
+# 6. 4と5で抽出した情報を基に左右の振り分け実施
 index = 0
 right = [["R-1","R-2","R-3","R-4","R-5","R-6","R-7","R-8","R-9","R-10","R-11","R-12","R-13","R-14","R-15","R-16","R-17","R-18","R-19","R-20","R-21","R-22","R-23","R-24","R-25","R-26"]]
 left = [["L-1","L-2","L-3","L-4","L-5","L-6","L-7","L-8","L-9","L-10","L-11","L-12","L-13","L-14","L-15","L-16","L-17","L-18","L-19","L-20","L-21","L-22","L-23","L-24","L-25","L-26"]]
 
 
+#6-1. 左右の変数に各病変の値を振り分けるための関数を設定
 def right_or_left():
     global index # index変数をglobal変数として扱う
     for row in csv_data:
@@ -154,7 +157,7 @@ def right_or_left():
 # print(right)
 # print(left)
 
-# 6-2.振り分けた値で左右がNoneの場合にnullの値を25個代入
+# 6-2.振り分けた値で左右がNoneの場合にnullの値を26個代入
 null_values_to_insert = 26
 null_row = [''] * null_values_to_insert
 
@@ -167,6 +170,8 @@ def left_None():
         if left[i] is None:
             left[i] = null_row
 
+
+# 7. 今までに設定した関数を順番に呼び出し、csvを希望の形にする
 for file in os.listdir(input):
     csv_data = process_csv_files(input, selected_columns)
     read_original()
@@ -182,7 +187,7 @@ for file in os.listdir(input):
     right = [["R-1","R-2","R-3","R-4","R-5","R-6","R-7","R-8","R-9","R-10","R-11","R-12","R-13","R-14","R-15","R-16","R-17","R-18","R-19","R-20","R-21","R-22","R-23","R-24","R-25","R-26"]]
     left = [["L-1","L-2","L-3","L-4","L-5","L-6","L-7","L-8","L-9","L-10","L-11","L-12","L-13","L-14","L-15","L-16","L-17","L-18","L-19","L-20","L-21","L-22","L-23","L-24","L-25","L-26"]]
 
-# 整形したcsvをinputフォルダに移動
+# 8. 整形したcsvをinputフォルダに移動
 for root, _, files in os.walk(input, topdown=False):
     for filename in files:
         if filename.endswith(".csv"):
@@ -190,7 +195,3 @@ for root, _, files in os.walk(input, topdown=False):
             input_for_batch_path = os.path.join(input_for_batch, filename)
             shutil.move(input_path, input_for_batch_path)
             print(f"{filename} を移動しました")
-
-
-        
-
