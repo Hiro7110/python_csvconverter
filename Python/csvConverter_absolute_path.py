@@ -7,11 +7,11 @@ import shutil
 import pandas as pd
 
 # 処理に必用な値を定義
-download = "C:\Python\download"
-work = "C:\Python\work"
-input = "C:\Python\input_python"
-input_for_batch = "C:\Python\input"
-output = "C:\Python\output"
+download = "C:\csvconverter\KTD_MMG\download"
+work = "C:\csvconverter\KTD_MMG\work"
+input = "C:\csvconverter\KTD_MMG\input_python"
+input_for_batch = "C:\csvconverter\KTD_MMG\input"
+output = "C:\csvconverter\KTD_MMG\output"
 col_1 = 29
 col_2 = 55
 col_3 = 81
@@ -31,12 +31,7 @@ for filename in os.listdir(download):
      if filename.endswith(".zip"):
         zip_path = os.path.join(download, filename)
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            for info in zip_ref.infolist():
-                filename_bytes = info.filename.encode('cp437')
-                filename = filename_bytes.decode('cp932', 'ignore')  # Decode with cp932 encoding
-                extracted_path = os.path.join(work, filename)
-                zip_ref.extract(info, path=work)
-                os.rename(os.path.join(work, info.filename), extracted_path)           
+            zip_ref.extractall(work)
             print(f"{filename} を解凍しました")
         os.remove(zip_path)
         print(f"{filename} を削除しました")
@@ -88,7 +83,6 @@ def read_csv_file(file_path, column_indices):
 original = []
 filtered=[]
 
-# 5-1. 元のcsvファイルを読み込んでoriginalに入れる関数を設定
 def read_original():
     if file.endswith(".csv"):
         file_path = os.path.join(input, file)
@@ -98,7 +92,6 @@ def read_original():
             for row in csv_reader:
                 original.append(row)
 
-# 5-2. 左右として抽出した値をfiltered変数に入れてcsvを上書きする関数を設定
 def filter_and_overwrite_csv():
     if file.endswith(".csv"):
         file_path = os.path.join(input, file)
@@ -123,31 +116,33 @@ def filter_and_overwrite_csv():
 
 # print(original)
 
-# 6. 4と5で抽出した情報を基に左右の振り分け実施
+# 6-1. 4と5で抽出した情報を基に左右の振り分け実施
 index = 0
 right = [["R-1","R-2","R-3","R-4","R-5","R-6","R-7","R-8","R-9","R-10","R-11","R-12","R-13","R-14","R-15","R-16","R-17","R-18","R-19","R-20","R-21","R-22","R-23","R-24","R-25","R-26"]]
 left = [["L-1","L-2","L-3","L-4","L-5","L-6","L-7","L-8","L-9","L-10","L-11","L-12","L-13","L-14","L-15","L-16","L-17","L-18","L-19","L-20","L-21","L-22","L-23","L-24","L-25","L-26"]]
 
 
-#6-1. 左右の変数に各病変の値を振り分けるための関数を設定
 def right_or_left():
     global index # index変数をglobal変数として扱う
     for row in csv_data:
-        # print(row)
+        print(row)
         index2 = 0
         R = None
         L = None
         while index2 < len(row):
-            # print(row[index2])                                
+            print(row[index2])                                
             if row[index2] == right_code and R is None:
                 R = original[index][selected_columns[index2]-1:selected_columns[index2+1]-1]
             elif row[index2] == left_code and L is None:
+                L = original[index][selected_columns[index2]-1:selected_columns[index2+1]-1]
+            elif row[index2] == bilateral_code and R is None and L is None:
+                R = original[index][selected_columns[index2]-1:selected_columns[index2+1]-1]                
                 L = original[index][selected_columns[index2]-1:selected_columns[index2+1]-1]
             elif row[index2] == bilateral_code and R is None:
                 R = original[index][selected_columns[index2]-1:selected_columns[index2+1]-1]
             elif row[index2] == bilateral_code and L is None:
                 L = original[index][selected_columns[index2]-1:selected_columns[index2+1]-1]
-            else:
+            elif R is not None and L is not None:
                 break
             index2 += 1
         right.append(R)
@@ -157,7 +152,7 @@ def right_or_left():
 # print(right)
 # print(left)
 
-# 6-2.振り分けた値で左右がNoneの場合にnullの値を26個代入
+# 6-2.振り分けた値で左右がNoneの場合にnullの値を25個代入
 null_values_to_insert = 26
 null_row = [''] * null_values_to_insert
 
@@ -170,8 +165,6 @@ def left_None():
         if left[i] is None:
             left[i] = null_row
 
-
-# 7. 今までに設定した関数を順番に呼び出し、csvを希望の形にする
 for file in os.listdir(input):
     csv_data = process_csv_files(input, selected_columns)
     read_original()
@@ -187,7 +180,7 @@ for file in os.listdir(input):
     right = [["R-1","R-2","R-3","R-4","R-5","R-6","R-7","R-8","R-9","R-10","R-11","R-12","R-13","R-14","R-15","R-16","R-17","R-18","R-19","R-20","R-21","R-22","R-23","R-24","R-25","R-26"]]
     left = [["L-1","L-2","L-3","L-4","L-5","L-6","L-7","L-8","L-9","L-10","L-11","L-12","L-13","L-14","L-15","L-16","L-17","L-18","L-19","L-20","L-21","L-22","L-23","L-24","L-25","L-26"]]
 
-# 8. 整形したcsvをinputフォルダに移動
+# 整形したcsvをinputフォルダに移動
 for root, _, files in os.walk(input, topdown=False):
     for filename in files:
         if filename.endswith(".csv"):
@@ -195,3 +188,7 @@ for root, _, files in os.walk(input, topdown=False):
             input_for_batch_path = os.path.join(input_for_batch, filename)
             shutil.move(input_path, input_for_batch_path)
             print(f"{filename} を移動しました")
+
+
+        
+
